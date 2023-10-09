@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        var canvas = document.getElementById("gameCanvas");
+        var ctx = canvas.getContext("2d");
+        
+        var GRID_SIZE = 20;
+        var GRID_WIDTH = canvas.width / GRID_SIZE;
+        var GRID_HEIGHT = canvas.height / GRID_SIZE;
+        
+        var snake = [{ x: 5, y: 5 }];
+        var food = { x: Math.floor(Math.random() * GRID_WIDTH), y: Math.floor(Math.random() * GRID_HEIGHT) };
+        var direction = "right";
+        
+        function drawSnake() {
+            ctx.fillStyle = "green";
+            for (var i = 0; i < snake.length; i++) {
+                ctx.fillRect(snake[i].x * GRID_SIZE, snake[i].y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+            }
+        }
+        
+        function drawFood() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        }
+        
+        function update() {
+            var headX = snake[0].x;
+            var headY = snake[0].y;
+        
+            if (direction === "right") headX++;
+            if (direction === "left") headX--;
+            if (direction === "up") headY--;
+            if (direction === "down") headY++;
+        
+            if (headX === food.x && headY === food.y) {
+                snake.unshift({ x: headX, y: headY });
+                food = { x: Math.floor(Math.random() * GRID_WIDTH), y: Math.floor(Math.random() * GRID_HEIGHT) };
+            } else {
+                snake.pop();
+                snake.unshift({ x: headX, y: headY });
+            }
+        
+            if (headX < 0 || headX >= GRID_WIDTH || headY < 0 || headY >= GRID_HEIGHT) {
+                clearInterval(gameInterval);
+                alert("Game over!");
+            }
+        
+            for (var i = 1; i < snake.length; i++) {
+                if (headX === snake[i].x && headY === snake[i].y) {
+                    clearInterval(gameInterval);
+                    alert("Game over!");
+                }
+            }
+        }
+        
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function gameLoop() {
+            clearCanvas();
+            drawSnake();
+            drawFood();
+            update();
+        }
+        
+        var gameInterval = setInterval(gameLoop, 100);
+        
+        document.addEventListener("keydown", function(event) {
+            switch (event.key) {
+                case "ArrowUp":
+                    if (direction !== "down") direction = "up";
+                    break;
+                case "ArrowDown":
+                    if (direction !== "up") direction = "down";
+                    break;
+                case "ArrowLeft":
+                    if (direction !== "right") direction = "left";
+                    break;
+                case "ArrowRight":
+                    if (direction !== "left") direction = "right";
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
